@@ -1,8 +1,6 @@
 package com.school.reservation.repository;
 
 import com.school.reservation.entity.Reservation;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
@@ -18,7 +16,4 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     /** 我的预约历史（按提交时间倒序） */
     List<Reservation> findByUserNameOrderByCreatedAtDesc(String userName);
-
-    /** 我的预约历史（分页：按预约日期倒序，同日按提交时间倒序，排序口径后端写死） */
-    Page<Reservation> findByUserNameOrderByDateDescCreatedAtDesc(String userName, Pageable pageable);
 }

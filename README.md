@@ -38,11 +38,21 @@ run-frontend.cmd    # 前端 :5173，浏览器打开 http://localhost:5173
 ```
 backend/                 SpringBoot 后端（源码 + pom.xml）
 frontend/                Vue3 前端（源码 + vite.config.js）
+docs/PRD.md              产品需求（做什么、给谁、怎么算成功）
+docs/技术方案.md          技术选型、数据模型、模块划分、目标态设计
+docs/任务看板.md          任务拆块与进度（M0–M8 + T3）
 docs/反思录/李诗滢/      每日反思件（过程档案）
+AGENTS.md                AI 协作规矩（改代码前必读）
 想法电梯稿.md            T3 一页电梯稿（开题）
 pitch.html               C1 挑战：电梯稿可访问单页站
 交作业自查.py            收工自查脚本（四盏灯）
 ```
+
+### 文档怎么读（3 分钟版）
+
+1. **只想知道这项目干嘛**：本 README + `想法电梯稿.md`
+2. **想知道接下来做什么**：`docs/PRD.md` §1 和 §5 演示脚本 → `docs/任务看板.md` 状态总览
+3. **要改代码（人或 AI）**：先读 `AGENTS.md`，再读 `docs/技术方案.md`
 
 ### 每日收工四步
 

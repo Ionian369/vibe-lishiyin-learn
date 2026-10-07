@@ -1,6 +1,5 @@
 package com.school.reservation.service;
 
-import com.school.reservation.dto.PageVO;
 import com.school.reservation.dto.ReservationRequest;
 import com.school.reservation.dto.ReservationVO;
 import com.school.reservation.entity.Device;
@@ -10,14 +9,10 @@ import com.school.reservation.repository.DeviceRepository;
 import com.school.reservation.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,12 +29,6 @@ public class ReservationService {
 
     @Transactional
     public ReservationVO create(ReservationRequest request) {
-        // 预约窗口：最多提前 14 天（今天 ~ 今天+14 均可约），防止无限远脏数据
-        LocalDate latest = LocalDate.now(ZoneId.systemDefault()).plusDays(14);
-        if (request.getDate().isAfter(latest)) {
-            throw new BizException(HttpStatus.BAD_REQUEST.value(), "预约日期最多提前 14 天");
-        }
-
         Device device = deviceRepository.findById(request.getDeviceId())
                 .orElseThrow(() -> new BizException(HttpStatus.NOT_FOUND.value(), "器材不存在"));
 
@@ -68,17 +57,6 @@ public class ReservationService {
         return reservationRepository.countByUserName(userName.trim());
     }
 
-    /** 取消预约（仅本人）：记录不存在 404，姓名与记录归属不一致 403 */
-    @Transactional
-    public void cancel(Long id, String userName) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new BizException(HttpStatus.NOT_FOUND.value(), "预约记录不存在"));
-        if (!reservation.getUserName().equals(userName.trim())) {
-            throw new BizException(HttpStatus.FORBIDDEN.value(), "只能取消自己的预约");
-        }
-        reservationRepository.delete(reservation);
-    }
-
     /** 我的预约历史列表（按提交时间倒序） */
     public List<ReservationVO> listByUser(String userName) {
         Map<Long, String> deviceNames = deviceRepository.findAll().stream()
@@ -86,26 +64,6 @@ public class ReservationService {
         return reservationRepository.findByUserNameOrderByCreatedAtDesc(userName.trim()).stream()
                 .map(r -> ReservationVO.from(r, deviceNames.getOrDefault(r.getDeviceId(), "未知器材")))
                 .toList();
-    }
-
-    /** 我的预约历史（分页）：页码/条数非法直接 400，排序口径为预约日期倒序 */
-    public PageVO<ReservationVO> pageByUser(String userName, int page, int size) {
-        // 入参校验：页码与每页条数必须为不小于 1 的整数，size 另设上限护栏防大页拖库
-        if (page < 1 || size < 1) {
-            throw new BizException(HttpStatus.BAD_REQUEST.value(), "页码与每页条数必须为不小于 1 的整数");
-        }
-        if (size > 100) {
-            throw new BizException(HttpStatus.BAD_REQUEST.value(), "每页最多 100 条");
-        }
-        // 前端页码从 1 开始，Spring Data 的 Pageable 从 0 开始，这里做一次换算
-        Page<Reservation> pageData = reservationRepository.findByUserNameOrderByDateDescCreatedAtDesc(
-                userName.trim(), PageRequest.of(page - 1, size));
-        Map<Long, String> deviceNames = deviceRepository.findAll().stream()
-                .collect(Collectors.toMap(Device::getId, Device::getName));
-        List<ReservationVO> list = pageData.getContent().stream()
-                .map(r -> ReservationVO.from(r, deviceNames.getOrDefault(r.getDeviceId(), "未知器材")))
-                .toList();
-        return new PageVO<>(list, pageData.getTotalElements(), page, size);
     }
 
     /** 构造 409 冲突异常，原因说明具体到器材 / 日期 / 时段 */
