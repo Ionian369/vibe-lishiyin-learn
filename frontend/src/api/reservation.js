@@ -51,3 +51,8 @@ export function fetchStats(user) {
 export function fetchMyReservations(user) {
   return api.get('/reservations', { params: { user } })
 }
+
+/** 取消预约（仅本人）：失败文案由后端下发（404 记录不存在 / 403 非本人） */
+export function cancelReservation(id, user) {
+  return api.delete(`/reservations/${id}`, { params: { user } })
+}

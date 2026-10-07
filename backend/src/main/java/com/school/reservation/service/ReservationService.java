@@ -57,6 +57,17 @@ public class ReservationService {
         return reservationRepository.countByUserName(userName.trim());
     }
 
+    /** 取消预约（仅本人）：记录不存在 404，姓名与记录归属不一致 403 */
+    @Transactional
+    public void cancel(Long id, String userName) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new BizException(HttpStatus.NOT_FOUND.value(), "预约记录不存在"));
+        if (!reservation.getUserName().equals(userName.trim())) {
+            throw new BizException(HttpStatus.FORBIDDEN.value(), "只能取消自己的预约");
+        }
+        reservationRepository.delete(reservation);
+    }
+
     /** 我的预约历史列表（按提交时间倒序） */
     public List<ReservationVO> listByUser(String userName) {
         Map<Long, String> deviceNames = deviceRepository.findAll().stream()

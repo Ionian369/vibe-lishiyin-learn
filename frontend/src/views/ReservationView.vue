@@ -93,7 +93,7 @@ onMounted(async () => {
         />
         <el-button @click="saveUser">保存姓名</el-button>
         <el-tag type="success" size="large" effect="light" class="count-tag">
-          我的预约成功次数：{{ count }}
+          累计预约成功 {{ count }} 次
         </el-tag>
       </div>
     </header>
