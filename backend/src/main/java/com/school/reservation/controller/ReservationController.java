@@ -1,5 +1,6 @@
 package com.school.reservation.controller;
 
+import com.school.reservation.dto.PageVO;
 import com.school.reservation.dto.ReservationRequest;
 import com.school.reservation.dto.ReservationVO;
 import com.school.reservation.dto.Result;
@@ -39,6 +40,15 @@ public class ReservationController {
     @GetMapping
     public Result<List<ReservationVO>> list(@RequestParam String user) {
         return Result.ok(reservationService.listByUser(user));
+    }
+
+    /** GET /api/reservations/page?user=xxx&page=1&size=10：我的预约历史（分页，按预约日期倒序） */
+    @GetMapping("/page")
+    public Result<PageVO<ReservationVO>> page(
+            @RequestParam String user,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return Result.ok(reservationService.pageByUser(user, page, size));
     }
 
     /** GET /api/reservations/stats?user=xxx：我的预约成功次数 */

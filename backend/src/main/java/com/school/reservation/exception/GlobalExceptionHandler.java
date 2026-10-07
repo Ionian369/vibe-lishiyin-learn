@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 /**
  * 全局异常处理：统一转成 Result 结构，前端只消费 message 字段
@@ -26,5 +27,11 @@ public class GlobalExceptionHandler {
                 .map(fieldError -> fieldError.getDefaultMessage())
                 .orElse("参数不合法");
         return ResponseEntity.badRequest().body(Result.fail(400, message));
+    }
+
+    /** 参数类型不匹配（如 page=abc）：同样转成 Result 结构的 400，文案指出具体参数名 */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Result<Void>> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+        return ResponseEntity.badRequest().body(Result.fail(400, "参数 %s 格式不正确".formatted(e.getName())));
     }
 }

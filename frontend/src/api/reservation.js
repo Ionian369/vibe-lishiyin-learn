@@ -51,3 +51,8 @@ export function fetchStats(user) {
 export function fetchMyReservations(user) {
   return api.get('/reservations', { params: { user } })
 }
+
+/** 我的预约历史（分页，按预约日期倒序）：{ list, total, page, size } */
+export function fetchReservationsPage(user, page, size) {
+  return api.get('/reservations/page', { params: { user, page, size } })
+}

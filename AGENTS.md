@@ -115,6 +115,7 @@ Base：`/api`。响应统一 `Result` 封装（`/api/ping` 除外）。
 | GET | `/api/devices` | 无 | `Result<data:[{id, name, description}]>` | — | ✅ 现状 |
 | POST | `/api/reservations` | Body：`{deviceId:int, date:"YYYY-MM-DD"(今天≤date≤今天+14), period:"上午"\|"下午", user:string(≤50字)}` | `Result<data:{id, deviceId, deviceName, date, period, userName, status, createdAt}>` | 400 参数不合法；404 器材不存在；409 时段冲突 | 🔶 演进中（14 天窗口、status 字段、user 长度校验待实施） |
 | GET | `/api/reservations` | Query：`user`（必填） | `Result<data: ReservationVO[]>`，按 createdAt 倒序，**最多 200 条** | 400 缺参（Result 封装） | 🔶 演进中（LIMIT 200、缺参封装待实施） |
+| GET | `/api/reservations/page` | Query：`user`（必填）、`page`（默认 1）、`size`（默认 10，≤100） | `Result<data:{list: ReservationVO[], total, page, size}>`，按预约日期倒序（同日按 createdAt 倒序） | 400 页码/条数非法（`page<1`、`size<1`、`size>100`、非数字） | ✅ 已实施（2026-10-07 拍板破例，红线 Q11 留痕见 §7） |
 | GET | `/api/reservations/stats` | Query：`user`（必填） | `Result<data:{"count":long}>` | 400 缺参（Result 封装） | ✅ 现状 |
 | DELETE | `/api/reservations/{id}` | Query：`user`（必填） | `Result<data:null>` | 404 记录不存在；403 非本人预约 | 🆕 P0 |
 
@@ -186,11 +187,11 @@ Base：`/api`。响应统一 `Result` 封装（`/api/ping` 除外）。
 | Q8 | 成功次数口径 | 累计成功预约数（含已结束） | 实现即口径，改文案不改逻辑 |
 | Q9 | 状态裁判 | 后端下发 | 见 T3 |
 | Q10 | device 重插 | 仅空表初始化 | 见 T6 |
-| Q11 | 全量返回 | 本期接受 + LIMIT 200 护栏 | 见 T7，分页排二期 |
+| Q11 | 全量返回 | 列表接口本期接受 + LIMIT 200 护栏（T7）；分页已破例以独立接口 `/api/reservations/page` 落地（2026-10-07 用户拍板） | 列表接口不动，分页需求由独立接口承接，破例须留痕 |
 | Q12 | 错误契约 | 统一收紧，ping 除外 | 见 T4 |
 | Q13 | console / CORS | 拆 profile，部署前收紧 | 见 T8 |
 
-**二期候选**（本期一律不启动）：登录（学号+口令）、库存数量、节次时段配置化、分页、器材管理界面。
+**二期候选**（本期一律不启动）：登录（学号+口令）、库存数量、节次时段配置化、器材管理界面。（分页已于 2026-10-07 破例落地为 `/api/reservations/page`，见 Q11 留痕）
 
 ---
 
