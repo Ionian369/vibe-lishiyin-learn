@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="T3 一页想法电梯稿：教务器材预约——给谁解决什么问题、核心功能三个、凭什么做得完、最大风险与对策、审题三问。">
+<title>电梯稿 · 教务器材预约</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ================= 主题变量：莫兰蒂粉紫 · 清新古典 ================= */
+:root {
+  --bg:        #f7f1ee;
+  --card:      #fffdfa;
+  --pink:      #d8b4be;
+  --pink-deep: #c99baa;
+  --purple:    #b5a3c6;
+  --purple-deep:#a08eb8;
+  --ink:       #574b5e;
+  --ink-2:     #8b7c92;
+  --ink-3:     #b6a9bb;
+  --line:      #e7dade;
+  --rose:      #bd8a8d;
+  --rose-bg:   #faf1f2;
+  --sage:      #92a58f;
+  --sage-bg:   #f3f6f2;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+::selection { background: var(--pink); color: #fff; }
+
+:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
+
+body {
+  font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  color: var(--ink);
+  min-height: 100vh;
+  background:
+    radial-gradient(1100px 480px at 12% -8%, rgba(216, 180, 190, .28), transparent 60%),
+    radial-gradient(1000px 460px at 92% -10%, rgba(181, 163, 198, .24), transparent 60%),
+    linear-gradient(180deg, #f8f2ef 0%, #f4ecea 100%);
+  background-attachment: fixed;
+  line-height: 1.9;
+}
+
+/* 可访问性：跳转链接（键盘用户首个 Tab 可见） */
+.skip {
+  position: absolute; left: 50%; top: -60px; transform: translateX(-50%);
+  z-index: 10; padding: 10px 24px; border-radius: 999px;
+  background: var(--purple-deep); color: #fff; font-size: 14px;
+  letter-spacing: .2em; text-indent: .2em; text-decoration: none;
+  transition: top .25s ease;
+}
+.skip:focus { top: 16px; }
+
+.container { max-width: 900px; margin: 0 auto; padding: 64px 24px 72px; }
+
+/* ================= 页头 ================= */
+.page-head { text-align: center; margin-bottom: 20px; }
+
+.eyebrow {
+  font-size: 11px; letter-spacing: .5em; text-indent: .5em;
+  color: var(--ink-3); text-transform: uppercase;
+}
+
+.title {
+  margin: 16px 0 20px;
+  font-size: 34px; font-weight: 600;
+  letter-spacing: .3em; text-indent: .3em;
+  background: linear-gradient(120deg, var(--pink-deep), var(--purple-deep));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+.divider { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.divider .line { width: 96px; height: 1px; background: linear-gradient(90deg, transparent, var(--ink-3)); }
+.divider .line:last-child { transform: scaleX(-1); }
+.divider .diamond { width: 6px; height: 6px; background: var(--purple); transform: rotate(45deg); opacity: .7; }
+
+.subtitle { margin-top: 18px; font-size: 14px; letter-spacing: .25em; text-indent: .25em; color: var(--ink-2); }
+
+/* ================= 章节通用 ================= */
+section { margin-top: 68px; }
+
+.sec-head { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.sec-head .rule { flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+
+.sec-title { display: flex; align-items: center; gap: 14px; }
+
+/* 章节号：方形细框印章样式 */
+.seal {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; flex: none;
+  border: 1px solid var(--purple); color: var(--purple-deep);
+  font-size: 15px; font-weight: 600; letter-spacing: 0;
+}
+
+.sec-title h2 { font-size: 18px; font-weight: 600; letter-spacing: .18em; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+section, .page-head { animation: rise .6s ease backwards; }
+section:nth-of-type(1) { animation-delay: .05s; }
+section:nth-of-type(2) { animation-delay: .12s; }
+section:nth-of-type(3) { animation-delay: .18s; }
+section:nth-of-type(4) { animation-delay: .24s; }
+section:nth-of-type(5) { animation-delay: .3s; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ================= 壹 · 给谁解决什么问题 ================= */
+.problem {
+  list-style: none; counter-reset: p;
+  display: grid; gap: 14px;
+}
+.problem li {
+  counter-increment: p;
+  position: relative;
+  background: var(--card); border: 1px solid var(--line); border-radius: 4px;
+  padding: 18px 22px 18px 58px;
+  box-shadow: 0 6px 18px rgba(150, 120, 145, .08);
+  font-size: 15px;
+}
+.problem li::before {
+  content: counter(p, cjk-ideographic);
+  position: absolute; left: 20px; top: 20px;
+  font-size: 15px; color: var(--purple-deep); font-weight: 600;
+}
+.problem li::after {
+  content: ""; position: absolute; left: 44px; top: 26px;
+  width: 5px; height: 5px; background: var(--pink); transform: rotate(45deg);
+}
+.problem b { color: var(--purple-deep); font-weight: 600; }
+
+/* ================= 贰 · 核心功能 ================= */
+.fn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+
+.fn-card {
+  position: relative;
+  background: var(--card); border: 1px solid var(--line); border-radius: 4px;
+  padding: 24px 20px 22px;
+  box-shadow: 0 10px 28px rgba(150, 120, 145, .10);
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+.fn-card:hover { transform: translateY(-5px); box-shadow: 0 18px 36px rgba(150, 120, 145, .16); }
+
+/* 角饰 */
+.fn-card::before, .fn-card::after { content: ""; position: absolute; width: 16px; height: 16px; pointer-events: none; }
+.fn-card::before { top: 7px; left: 7px; border-top: 1px solid var(--purple); border-left: 1px solid var(--purple); }
+.fn-card::after { bottom: 7px; right: 7px; border-bottom: 1px solid var(--pink-deep); border-right: 1px solid var(--pink-deep); }
+
+.fn-no {
+  font-size: 12px; letter-spacing: .3em; text-indent: .3em; color: var(--ink-3);
+}
+.fn-card h3 {
+  margin: 10px 0 12px;
+  font-size: 19px; font-weight: 600; letter-spacing: .1em;
+  background: linear-gradient(120deg, var(--pink-deep), var(--purple-deep));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.fn-card p { font-size: 13px; color: var(--ink-2); }
+
+/* ================= 叁 · 凭什么做得完 ================= */
+.course-list { list-style: none; display: grid; gap: 12px; }
+
+.course-item {
+  display: flex; align-items: center; gap: 18px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 4px;
+  padding: 14px 18px;
+  box-shadow: 0 6px 18px rgba(150, 120, 145, .08);
+}
+.course-tag {
+  flex: none;
+  font-size: 13px; letter-spacing: .08em; color: #fff;
+  background: linear-gradient(135deg, var(--pink-deep), var(--purple-deep));
+  border-radius: 999px; padding: 6px 18px;
+}
+.course-arrow { flex: none; width: 30px; height: 1px; background: var(--ink-3); position: relative; }
+.course-arrow::after {
+  content: ""; position: absolute; right: 0; top: -2.5px;
+  width: 6px; height: 6px; border-top: 1px solid var(--ink-3); border-right: 1px solid var(--ink-3);
+  transform: rotate(45deg);
+}
+.course-why { font-size: 14px; color: var(--ink); min-width: 0; }
+
+/* ================= 肆 · 风险与对策 ================= */
+.risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+
+.risk-card {
+  border-radius: 4px; padding: 22px 22px 20px;
+  border: 1px solid var(--line);
+}
+.risk-card.risk { background: var(--rose-bg); border-left: 3px solid var(--rose); }
+.risk-card.plan { background: var(--sage-bg); border-left: 3px solid var(--sage); }
+
+.risk-label {
+  display: inline-block; font-size: 12px; letter-spacing: .35em; text-indent: .35em;
+  color: #fff; border-radius: 999px; padding: 4px 14px; margin-bottom: 14px;
+}
+.risk-card.risk .risk-label { background: linear-gradient(135deg, #c49396, #b07d84); }
+.risk-card.plan .risk-label { background: linear-gradient(135deg, #9bad94, #7f947a); }
+
+.risk-card p { font-size: 14px; color: var(--ink); }
+.risk-card b { font-weight: 600; }
+
+/* ================= 伍 · 审题三问 ================= */
+.review-list { display: grid; gap: 14px; }
+.review-item {
+  background: var(--card); border: 1px solid var(--line); border-radius: 4px;
+  padding: 18px 22px;
+  box-shadow: 0 6px 18px rgba(150, 120, 145, .08);
+}
+.review-q {
+  display: flex; align-items: baseline; gap: 12px;
+  font-size: 15px; font-weight: 600; letter-spacing: .05em;
+}
+.review-q .q {
+  font-size: 11px; color: var(--purple-deep); letter-spacing: .2em;
+  border: 1px solid var(--purple); border-radius: 999px; padding: 1px 9px; flex: none;
+}
+.review-a { margin-top: 10px; padding-left: 2px; font-size: 14px; color: var(--ink-2); }
+.review-a b { color: var(--ink); font-weight: 600; }
+
+/* ================= 页脚 ================= */
+.page-foot { margin-top: 76px; text-align: center; }
+.page-foot .divider { margin-bottom: 18px; }
+.page-foot span { font-size: 12px; color: var(--ink-3); letter-spacing: .4em; text-indent: .4em; }
+.page-foot .meta { display: block; margin-top: 10px; font-size: 11px; letter-spacing: .2em; text-indent: .2em; }
+
+/* ================= 响应式 ================= */
+@media (max-width: 760px) {
+  .container { padding: 48px 16px 56px; }
+  .title { font-size: 26px; }
+  .fn-grid { grid-template-columns: 1fr; }
+  .risk-grid { grid-template-columns: 1fr; }
+  .course-item { flex-wrap: wrap; gap: 12px; }
+  .course-arrow { display: none; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">跳到正文</a>
+
+<div class="container">
+
+  <header class="page-head">
+    <p class="eyebrow">T3 · One Page Pitch</p>
+    <h1 class="title">一页想法电梯稿</h1>
+    <div class="divider" aria-hidden="true"><span class="line"></span><span class="diamond"></span><span class="line"></span></div>
+    <p class="subtitle">教务器材预约 · 五分钟讲清楚一个想法</p>
+  </header>
+
+  <main id="main">
+
+    <!-- 壹 · 给谁解决什么问题 -->
+    <section aria-labelledby="sec1">
+      <div class="sec-head">
+        <div class="sec-title">
+          <span class="seal" aria-hidden="true">壹</span>
+          <h2 id="sec1">给谁 · 解决什么问题</h2>
+        </div>
+        <span class="rule" aria-hidden="true"></span>
+      </div>
+      <ol class="problem">
+        <li><b>给借器材的人</b>——普通同学、社团干事：借投影仪、音响、无线话筒靠班群接龙，谁先约到全凭记忆，到了现场才发现设备被人拿走。</li>
+        <li><b>给管器材的人</b>——课代表、教务器材管理员：每周手工核对共享表格，两个班约了同一台投影仪只能现场扯皮。</li>
+        <li><b>系统做什么</b>——把「同一器材 + 同一日期 + 同一时段」做成只能被约走一次：第二次提交当场被拒（409），红字提示到具体器材与时段。</li>
+      </ol>
+    </section>
+
+    <!-- 贰 · 核心功能 -->
+    <section aria-labelledby="sec2">
+      <div class="sec-head">
+        <div class="sec-title">
+          <span class="seal" aria-hidden="true">贰</span>
+          <h2 id="sec2">核心功能 · 恰好三个</h2>
+        </div>
+        <span class="rule" aria-hidden="true"></span>
+      </div>
+      <div class="fn-grid">
+        <article class="fn-card">
+          <span class="fn-no">功能一</span>
+          <h3>浏览器材</h3>
+          <p>首屏三张卡片——投影仪 / 音响 / 无线话筒，含名称与用途说明，空闲与否一眼可辨。</p>
+        </article>
+        <article class="fn-card">
+          <span class="fn-no">功能二</span>
+          <h3>提交预约</h3>
+          <p>选日期与上午／下午时段提交；同一器材同一时段第二次提交返回 409，弹窗持久展示冲突原因，改选即可重试。</p>
+        </article>
+        <article class="fn-card">
+          <span class="fn-no">功能三</span>
+          <h3>查询历史</h3>
+          <p>填姓名即出「我的预约历史」：器材 / 日期 / 时段 / 待使用或已结束 / 提交时间，成功次数实时累计。</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 叁 · 凭什么做得完 -->
+    <section aria-labelledby="sec3">
+      <div class="sec-head">
+        <div class="sec-title">
+          <span class="seal" aria-hidden="true">叁</span>
+          <h2 id="sec3">凭什么做得完</h2>
+        </div>
+        <span class="rule" aria-hidden="true"></span>
+      </div>
+      <ul class="course-list">
+        <li class="course-item">
+          <span class="course-tag">Web 前端开发</span>
+          <span class="course-arrow" aria-hidden="true"></span>
+          <span class="course-why">Vue3 + Element Plus 组件化与表单交互；Day1 上午已一句话生成静态版并实测通过。</span>
+        </li>
+        <li class="course-item">
+          <span class="course-tag">Java 程序设计</span>
+          <span class="course-arrow" aria-hidden="true"></span>
+          <span class="course-why">SpringBoot + JPA 分层结构（Controller / Service / Repository），骨架当天已跑通。</span>
+        </li>
+        <li class="course-item">
+          <span class="course-tag">数据库原理</span>
+          <span class="course-arrow" aria-hidden="true"></span>
+          <span class="course-why">H2 + UNIQUE(device_id, date, period) 唯一索引，并发抢同一时段由索引兜底——不只是应用层判重。</span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 肆 · 最大风险与对策 -->
+    <section aria-labelledby="sec4">
+      <div class="sec-head">
+        <div class="sec-title">
+          <span class="seal" aria-hidden="true">肆</span>
+          <h2 id="sec4">最大风险一条 · 对策各一</h2>
+        </div>
+        <span class="rule" aria-hidden="true"></span>
+      </div>
+      <div class="risk-grid">
+        <article class="risk-card risk">
+          <span class="risk-label">最大风险</span>
+          <p><b>无登录体系，姓名即身份。</b>任何人填别人的姓名，就能以他人名义占用时段、查看他人历史。</p>
+        </article>
+        <article class="risk-card plan">
+          <span class="risk-label">唯一对策</span>
+          <p><b>明示边界 + 留好接口。</b>Day1 场景限定班内互信，演示时说明这是已知边界；数据表预留 user_name 字段，二期接学号登录，不改表。</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 伍 · 审题三问 -->
+    <section aria-labelledby="sec5">
+      <div class="sec-head">
+        <div class="sec-title">
+          <span class="seal" aria-hidden="true">伍</span>
+          <h2 id="sec5">审题三问</h2>
+        </div>
+        <span class="rule" aria-hidden="true"></span>
+      </div>
+      <div class="review-list">
+        <div class="review-item">
+          <p class="review-q"><span class="q">问一</span>用户真实存在吗？</p>
+          <p class="review-a"><b>存在。</b>我自己借投影仪就遇过「接龙排到我但设备被拿走」；课代表每周核对预约要花一节课。两类用户本班本学期就有，不用想象。</p>
+        </div>
+        <div class="review-item">
+          <p class="review-q"><span class="q">问二</span>砍掉一个功能，行不行？</p>
+          <p class="review-a"><b>行。</b>砍掉「查询历史」，主线「约器材 + 冲突拒绝」依然完整成立——历史只是让借的人少问一句「我约上没有」，它是增强项而非生死项。</p>
+        </div>
+        <div class="review-item">
+          <p class="review-q"><span class="q">问三</span>演示第一眼看什么？</p>
+          <p class="review-a"><b>连点两次「预约」</b>：第一次绿色成功，第二次红色 409、冲突原因具体到器材／日期／时段——<b>冲突拒绝是本系统的灵魂</b>，是区分「预约系统」和「表单收集器」的瞬间。</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="page-foot">
+    <div class="divider" aria-hidden="true"><span class="line"></span><span class="diamond"></span><span class="line"></span></div>
+    <span>器材有序 · 时光有约</span>
+    <span class="meta">T3 电梯稿 · 组内互讲五分钟 · 离场提交</span>
+  </footer>
+
+</div>
+
+</body>
+</html>
