@@ -30,11 +30,6 @@ async function refreshStats() {
   myReservations.value = list
 }
 
-// 状态：预约日期已过为“已结束”，否则“待使用”
-function reservationStatus(item) {
-  return item.date < new Date().toISOString().slice(0, 10) ? '已结束' : '待使用'
-}
-
 // 提交时间格式化：YYYY-MM-DD HH:mm
 function formatTime(value) {
   return (value || '').slice(0, 16).replace('T', ' ')
@@ -123,8 +118,8 @@ onMounted(async () => {
           <el-table-column prop="period" label="时段" width="80" />
           <el-table-column label="状态" width="100">
             <template #default="{ row }">
-              <el-tag :type="reservationStatus(row) === '待使用' ? 'success' : 'info'" effect="light">
-                {{ reservationStatus(row) }}
+              <el-tag :type="row.status === '待使用' ? 'success' : 'info'" effect="light">
+                {{ row.status }}
               </el-tag>
             </template>
           </el-table-column>
