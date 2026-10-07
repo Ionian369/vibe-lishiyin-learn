@@ -3,6 +3,7 @@ package com.school.reservation.exception;
 import com.school.reservation.dto.Result;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -26,5 +27,11 @@ public class GlobalExceptionHandler {
                 .map(fieldError -> fieldError.getDefaultMessage())
                 .orElse("参数不合法");
         return ResponseEntity.badRequest().body(Result.fail(400, message));
+    }
+
+    /** 缺少必填 query 参数（如 GET /api/reservations 不带 user）：同样落 Result 结构的 400 */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Result<Void>> handleMissingParam(MissingServletRequestParameterException e) {
+        return ResponseEntity.badRequest().body(Result.fail(400, "缺少必填参数：" + e.getParameterName()));
     }
 }

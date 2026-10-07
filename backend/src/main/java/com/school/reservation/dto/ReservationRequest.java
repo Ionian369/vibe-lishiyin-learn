@@ -4,6 +4,7 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,5 +29,6 @@ public class ReservationRequest {
     private String period;
 
     @NotBlank(message = "请填写姓名")
+    @Size(max = 50, message = "姓名不能超过 50 字")
     private String user;
 }
