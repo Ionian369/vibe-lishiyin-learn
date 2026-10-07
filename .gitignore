@@ -2,6 +2,9 @@
 backend/target/
 backend/data/
 
+# ---- H2 数据文件（根目录运行时产生）----
+data/
+
 # ---- 前端 ----
 frontend/node_modules/
 frontend/dist/
