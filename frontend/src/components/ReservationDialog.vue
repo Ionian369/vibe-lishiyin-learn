@@ -26,11 +26,14 @@ watch(
   }
 )
 
-// 禁选今天之前的日期
+// 禁选今天之前、以及今天 +14 天之后的日期（与后端窗口校验同口径，后端为准）
+const MAX_ADVANCE_DAYS = 14
 function disabledDate(date) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  return date.getTime() < today.getTime()
+  const latest = new Date(today)
+  latest.setDate(latest.getDate() + MAX_ADVANCE_DAYS + 1)
+  return date.getTime() < today.getTime() || date.getTime() >= latest.getTime()
 }
 
 function close() {

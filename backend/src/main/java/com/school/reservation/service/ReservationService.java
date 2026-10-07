@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,6 +34,12 @@ public class ReservationService {
 
     @Transactional
     public ReservationVO create(ReservationRequest request) {
+        // 预约窗口：最多提前 14 天（今天 ~ 今天+14 均可约），防止无限远脏数据
+        LocalDate latest = LocalDate.now(ZoneId.systemDefault()).plusDays(14);
+        if (request.getDate().isAfter(latest)) {
+            throw new BizException(HttpStatus.BAD_REQUEST.value(), "预约日期最多提前 14 天");
+        }
+
         Device device = deviceRepository.findById(request.getDeviceId())
                 .orElseThrow(() -> new BizException(HttpStatus.NOT_FOUND.value(), "器材不存在"));
 
