@@ -113,10 +113,10 @@ Base：`/api`。响应统一 `Result` 封装（`/api/ping` 除外）。
 |---|---|---|---|---|---|
 | GET | `/api/ping` | 无 | `{"status":"ok"}` | — | ✅ 现状 |
 | GET | `/api/devices` | 无 | `Result<data:[{id, name, description}]>` | — | ✅ 现状 |
-| POST | `/api/reservations` | Body：`{deviceId:int, date:"YYYY-MM-DD"(今天≤date≤今天+14), period:"上午"\|"下午", user:string(≤50字)}` | `Result<data:{id, deviceId, deviceName, date, period, userName, status, createdAt}>` | 400 参数不合法；404 器材不存在；409 时段冲突 | 🔶 演进中（14 天窗口、status 字段、user 长度校验待实施） |
-| GET | `/api/reservations` | Query：`user`（必填） | `Result<data: ReservationVO[]>`，按 createdAt 倒序，**最多 200 条** | 400 缺参（Result 封装） | 🔶 演进中（LIMIT 200、缺参封装待实施） |
+| POST | `/api/reservations` | Body：`{deviceId:int, date:"YYYY-MM-DD"(今天≤date≤今天+14), period:"上午"\|"下午", user:string(≤50字)}` | `Result<data:{id, deviceId, deviceName, date, period, userName, status, createdAt}>` | 400 参数不合法；404 器材不存在；409 时段冲突 | ✅ 现状（14 天窗口、status、user ≤50 字均已实施） |
+| GET | `/api/reservations` | Query：`user`（必填） | `Result<data: ReservationVO[]>`，按 createdAt 倒序，**最多 200 条** | 400 缺参（Result 封装） | 🔶 演进中（缺参封装已落地；LIMIT 200 待实施） |
 | GET | `/api/reservations/stats` | Query：`user`（必填） | `Result<data:{"count":long}>` | 400 缺参（Result 封装） | ✅ 现状 |
-| DELETE | `/api/reservations/{id}` | Query：`user`（必填） | `Result<data:null>` | 404 记录不存在；403 非本人预约 | 🆕 P0 |
+| DELETE | `/api/reservations/{id}` | Query：`user`（必填） | `Result<data:null>` | 404 记录不存在；403 非本人预约 | ✅ 现状（905cc18） |
 
 `ReservationVO.status` 取值：`"待使用"`（date ≥ 服务器今天）/ `"已结束"`（date < 服务器今天）。
 
@@ -126,24 +126,24 @@ Base：`/api`。响应统一 `Result` 封装（`/api/ping` 除外）。
 
 ### P0（主线，先做）
 
-**T1 · 取消预约（仅本人）** — "约错只能改库"是真实痛点
+**T1 · 取消预约（仅本人）** — "约错只能改库"是真实痛点 ✅（2026-10-07 重做轮，905cc18）
 - 后端：`DELETE /api/reservations/{id}?user=xxx`，校验记录存在（404）与 `user_name` 归属一致（403，文案如「只能取消自己的预约」）
 - 前端：历史列表行内加「取消」按钮，二次确认后调用；成功后 toast + 刷新历史与次数
 - 验收：① 本人取消成功，列表移除该行、次数 -1；② 换一个姓名取消同一条 → 403，记录不变；③ 取消不存在的 id → 404；④ curl 复测同结果
 
-**T2 · 限制最多提前 14 天** — 两处小改，防脏数据
+**T2 · 限制最多提前 14 天** — 两处小改，防脏数据 ✅（2026-10-07 重做轮，79f7304；前端禁选为基线保留，未再改）
 - 前端：`disabledDate` 在禁过去日期基础上，同时禁今天 +14 天之后的日期
 - 后端：Service 校验 `date > today+14` → `BizException(400, "预约日期最多提前 14 天")`
 - 验收：① 选择器中第 15 天及以后不可选；② 直调 API 传超限日期 → 400 文案正确；③ 今天与 +14 天当天均可约
 
-**T3 · 状态改由后端下发** — 边界只允许一个裁判，演示不被时区坑
+**T3 · 状态改由后端下发** — 边界只允许一个裁判，演示不被时区坑 ✅（1b02677 为基线保留，2026-10-07 重做轮复验通过）
 - 后端：`ReservationVO` 加 `status` 字段，按服务器时间计算（见 §5）
 - 前端：删除本地 `reservationStatus()` 计算，直接渲染 `row.status`
 - 验收：① 改系统时间或用跨时区手法验证口径一致；② 响应 JSON 含 status 字段且取值合法
 
 ### P1（打磨期，不阻塞主线）
 
-**T4 · 错误契约统一收紧**
+**T4 · 错误契约统一收紧** ✅（2026-10-07 重做轮，c66cdf4）
 - `ReservationRequest.user` 加 `@Size(max=50, message="姓名不能超过 50 字")`（与 DB 列宽一致，超长落 400 而非 500）
 - `GlobalExceptionHandler` 补 `MissingServletRequestParameterException` 处理：缺参也返回 `Result(400)`
 - `/api/ping` 保留裸 JSON（已注明的例外）
@@ -168,7 +168,7 @@ Base：`/api`。响应统一 `Result` 封装（`/api/ping` 除外）。
 - `prod`：`spring.profiles.active=prod` 启动——关 H2 console；前端 `vite build` 产物由 Spring Boot 同源静态托管，**同源后删除 `WebConfig` 的 CORS 全放行配置**
 - 验收：prod 模式下 `/h2-console` 不可达，页面经 `:8080` 直接可用
 
-**文案微调（随任意 P0/P1 顺带）**：成功次数标签改为「累计预约成功 N 次」——口径定为累计成功预约数（含已结束），用文案消除歧义，不动逻辑。
+**文案微调（随任意 P0/P1 顺带）**：成功次数标签改为「累计预约成功 N 次」——口径定为累计成功预约数（含已结束），用文案消除歧义，不动逻辑。✅ 已随 905cc18 落地
 
 ---
 
