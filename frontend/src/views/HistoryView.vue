@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
-import { fetchReservationsPage, getUser } from '../api/reservation'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { cancelReservation, fetchReservationsPage, getUser } from '../api/reservation'
 
 // 分页状态：页码从 1 开始，与后端契约一致
 const page = ref(1)
@@ -44,6 +45,27 @@ watch(size, () => {
   }
 })
 
+// 取消预约（仅本人）：二次确认后调用，失败文案由后端经拦截器弹出
+async function cancel(row) {
+  try {
+    await ElMessageBox.confirm(
+      `确定取消「${row.deviceName} ${row.date} ${row.period}」的预约吗？`,
+      '取消预约',
+      { type: 'warning', confirmButtonText: '确定取消', cancelButtonText: '再想想' }
+    )
+  } catch {
+    return // 用户点了"再想想"，不打扰
+  }
+  await cancelReservation(row.id, userName.value.trim())
+  ElMessage.success('已取消该预约')
+  // 若删掉的是本页最后一条，先回退一页避免停留在空页
+  if (records.value.length === 1 && page.value > 1) {
+    page.value -= 1 // 触发 page 的 watch 重新加载
+  } else {
+    loadPage()
+  }
+}
+
 onMounted(loadPage)
 </script>
 
@@ -71,6 +93,11 @@ onMounted(loadPage)
         <el-table-column label="提交时间" min-width="150">
           <template #default="{ row }">
             {{ formatTime(row.createdAt) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="90">
+          <template #default="{ row }">
+            <el-button size="small" type="danger" plain @click="cancel(row)">取消</el-button>
           </template>
         </el-table-column>
         <template #empty>

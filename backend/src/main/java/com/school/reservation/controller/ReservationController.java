@@ -7,7 +7,9 @@ import com.school.reservation.dto.Result;
 import com.school.reservation.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,5 +57,12 @@ public class ReservationController {
     @GetMapping("/stats")
     public Result<Map<String, Long>> stats(@RequestParam String user) {
         return Result.ok(Map.of("count", reservationService.countByUser(user)));
+    }
+
+    /** DELETE /api/reservations/{id}?user=xxx：取消预约（仅本人，404/403 由 Service 判定） */
+    @DeleteMapping("/{id}")
+    public Result<Void> cancel(@PathVariable Long id, @RequestParam String user) {
+        reservationService.cancel(id, user);
+        return Result.ok(null);
     }
 }

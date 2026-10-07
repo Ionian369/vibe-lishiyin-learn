@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import { fetchDevices, fetchMyReservations, fetchStats, getUser, setUser } from '../api/reservation'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { cancelReservation, fetchDevices, fetchMyReservations, fetchStats, getUser, setUser } from '../api/reservation'
 import DeviceCard from '../components/DeviceCard.vue'
 import ReservationDialog from '../components/ReservationDialog.vue'
 
@@ -60,6 +60,22 @@ function openReserve(device) {
   dialogVisible.value = true
 }
 
+// 取消预约（仅本人）：二次确认后调用，失败文案由后端经拦截器弹出
+async function cancel(row) {
+  try {
+    await ElMessageBox.confirm(
+      `确定取消「${row.deviceName} ${row.date} ${row.period}」的预约吗？`,
+      '取消预约',
+      { type: 'warning', confirmButtonText: '确定取消', cancelButtonText: '再想想' }
+    )
+  } catch {
+    return // 用户点了"再想想"，不打扰
+  }
+  await cancelReservation(row.id, userName.value.trim())
+  ElMessage.success('已取消该预约')
+  refreshStats()
+}
+
 onMounted(async () => {
   devices.value = await fetchDevices()
   refreshStats()
@@ -115,6 +131,11 @@ onMounted(async () => {
           <el-table-column label="提交时间" min-width="150">
             <template #default="{ row }">
               {{ formatTime(row.createdAt) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="90">
+            <template #default="{ row }">
+              <el-button size="small" type="danger" plain @click="cancel(row)">取消</el-button>
             </template>
           </el-table-column>
           <template #empty>
